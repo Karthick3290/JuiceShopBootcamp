@@ -4,7 +4,7 @@ pipeline {
    stages {
       stage('checkout') {
          steps {
-            checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/swati-kalra/juiceshop']]])
+            checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/Karthick3290/JuiceShopBootcamp']]])
          }
       }
       stage('Maven installation') {
