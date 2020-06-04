@@ -1,5 +1,6 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -29,41 +30,46 @@ public class TestClass extends BaseUI {
         }
     }
 
+    void dismissPopUpBanner() {
+        if (driver.findElements(By.xpath("//button[@aria-label='Close Welcome Banner']")).size() > 0)
+            driver.findElement(By.xpath("//button[@aria-label='Close Welcome Banner']")).click();
+        if (driver.findElements(By.cssSelector("div[aria-label='cookieconsent']")).size() > 0 && driver.findElement(By.cssSelector("div[aria-label='cookieconsent']")).isDisplayed())
+            driver.findElement(By.cssSelector("a[aria-label='dismiss cookie message']")).click();
+    }
+
     @Test(priority = 1)
     public void register() {
+        dismissPopUpBanner();
         driver.get("http://"+url+":3000/#/register");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"mat-dialog-0\"]/app-welcome-banner/div/div[2]/button[2]"))).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("emailControl"))).sendKeys(email);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("passwordControl"))).sendKeys(password);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("repeatPasswordControl"))).sendKeys(password);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("securityQuestion"))).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[@class='mat-option-text']"))).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("securityAnswerControl"))).sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email"))).sendKeys(email);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))).sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("repeatPassword"))).sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//mat-select[@name='securityQuestion']"))).click();
+        driver.findElement(By.xpath(String.format("//span[(@class='mat-option-text') and text()[normalize-space() = '%s']]", "Your eldest siblings middle name?"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("securityAnswerControl"))).sendKeys("Krishnan");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("registerButton"))).click();
     }
 
     @Test(priority = 2)
     public void login() {
-        driver.get("http://"+url+":3000/#/login");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email"))).sendKeys(email);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))).sendKeys(password);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("loginButton"))).click();
-
-        boolean verifyLogin = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@aria-label='Add to Basket'][1]"))).isDisplayed();
+        boolean verifyLogin = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//button[@aria-label='Add to Basket'])[1]"))).isDisplayed();
         Assert.assertEquals(verifyLogin, true);
     }
 
     @Test(priority = 3)
     public void addToCart() {
-        driver.findElement(By.xpath("//button[@aria-label='Add to Basket'][1]")).click();
+        driver.findElement(By.xpath("(//button[@aria-label='Add to Basket'])[1]")).click();
         Assert.assertEquals(driver.findElement(By.xpath("/html/body/app-root/div/mat-sidenav-container/mat-sidenav-content/app-navbar/mat-toolbar/mat-toolbar-row/button[4]/span/span[2]")).isDisplayed(), true);
     }
 
     @Test(priority = 4)
     public void deleteItemFromCart() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/app-root/div/mat-sidenav-container/mat-sidenav-content/app-navbar/mat-toolbar/mat-toolbar-row/button[4]"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button//span[contains(text(),'Your Basket')]"))).click();
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        driver.findElement(By.xpath("/html/body/app-root/div/mat-sidenav-container/mat-sidenav-content/app-basket/mat-card/app-purchase-basket/mat-table/mat-row/mat-cell[5]/button")).click();
+        driver.findElement(By.xpath("//mat-cell[contains(@class,'remove')]//button")).click();
     }
 
     @AfterClass
