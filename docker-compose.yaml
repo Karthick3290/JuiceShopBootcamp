@@ -30,7 +30,7 @@ services:
   juice-shop:
     image: bkimminich/juice-shop
     ports:
-      - "3000:3111"
+      - "3000:3000"
 
   jenkins:
     #    image: jenkins/jenkins
